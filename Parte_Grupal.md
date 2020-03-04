@@ -1,168 +1,167 @@
-Responsabilidad Grupal:
+# Grupal
 
 ## Tarea 1 
 **Importad el fichero resultante de la exportación completa de las tablas y los datos de una instancia de ORACLE en otra instancia diferente empleando el comando impdp y explicad qué problemas surgen. Realizad un remapeo de esquemas si es necesario.**
 
-Necesitamos que el usuario que va a realizar la exportación tenga los siguientes privilegios:
-```sql
-GRANT EXP_FULL_DATABASE to system;
-GRANT IMP_FULL_DATABASE to system;
-```
-Luego tenemos que indicarle el parametro `full=Y`.
-
-> **NOTA**: la opción `full=Y` indica que todos los datos y metadatos deben exportarse.
-
-Creamos la exportación de la base de datos.
 ~~~
-expdp system/Oracle19 full=Y directory=dp dumpfile=CopiaCompleta.dmp logfile=CopiaCompleta.log
+ara realizar dicha tarea primeramente vamos a crear un usuario en el cual vamos a crear unas tablas, creamos un directorio para la exportación y posteriormente haremos la exportación.
 
-  Export: Release 12.2.0.1.0 - Production on Jue Feb 20 09:47:56 2020
+- Creamos un tablespace para el usuario.
 
-  Copyright (c) 1982, 2017, Oracle and/or its affiliates.  All rights reserved.
 
-  Conectado a: Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
 
-  Advertencia: Las operaciones de Oracle Data Pump no se necesitan normalmente cuando se conecta a la   raíz o al elemento inicial de una base de datos del contenedor.
+SQL> CREATE USER usuario1 IDENTIFIED BY usuario1 ;
+SQL> CREATE USER usuario2 IDENTIFIED BY usuario2 ;
+SQL> grant all privileges to usuario1;
+SQL> grant all privileges to usuario2;
 
-  Iniciando "SYSTEM"."SYS_EXPORT_FULL_01":  system/******** full=Y directory=dp dumpfile=CopiaCompleta. dmp logfile=CopiaCompleta.log 
-  Procesando el tipo de objeto DATABASE_EXPORT/EARLY_OPTIONS/VIEWS_AS_TABLES/TABLE_DATA
-  Procesando el tipo de objeto DATABASE_EXPORT/NORMAL_OPTIONS/TABLE_DATA
-  Procesando el tipo de objeto DATABASE_EXPORT/NORMAL_OPTIONS/VIEWS_AS_TABLES/TABLE_DATA
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/TABLE/TABLE_DATA
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/TABLE/INDEX/STATISTICS/INDEX_STATISTICS
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/TABLE/STATISTICS/TABLE_STATISTICS
-  Procesando el tipo de objeto DATABASE_EXPORT/STATISTICS/MARKER
-  Procesando el tipo de objeto DATABASE_EXPORT/PRE_SYSTEM_IMPCALLOUT/MARKER
-  Procesando el tipo de objeto DATABASE_EXPORT/PRE_INSTANCE_IMPCALLOUT/MARKER
-  Procesando el tipo de objeto DATABASE_EXPORT/TABLESPACE
-  Procesando el tipo de objeto DATABASE_EXPORT/PROFILE
-  Procesando el tipo de objeto DATABASE_EXPORT/SYS_USER/USER
-  Procesando el tipo de objeto DATABASE_EXPORT/RADM_FPTM
-  Procesando el tipo de objeto DATABASE_EXPORT/GRANT/SYSTEM_GRANT/PROC_SYSTEM_GRANT
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/GRANT/SYSTEM_GRANT
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/ROLE_GRANT
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/DEFAULT_ROLE
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/ON_USER_GRANT
-  Procesando el tipo de objeto DATABASE_EXPORT/RESOURCE_COST
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/DB_LINK
-  Procesando el tipo de objeto DATABASE_EXPORT/TRUSTED_DB_LINK
-  Procesando el tipo de objeto DATABASE_EXPORT/DIRECTORY/DIRECTORY
-  Procesando el tipo de objeto DATABASE_EXPORT/DIRECTORY/GRANT/OWNER_GRANT/OBJECT_GRANT
-  Procesando el tipo de objeto DATABASE_EXPORT/SYSTEM_PROCOBJACT/PRE_SYSTEM_ACTIONS/PROCACT_SYSTEM
-  Procesando el tipo de objeto DATABASE_EXPORT/SYSTEM_PROCOBJACT/PROCOBJ
-  Procesando el tipo de objeto DATABASE_EXPORT/SYSTEM_PROCOBJACT/POST_SYSTEM_ACTIONS/PROCACT_SYSTEM
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/PROCACT_SCHEMA
-  Procesando el tipo de objeto DATABASE_EXPORT/EARLY_OPTIONS/VIEWS_AS_TABLES/TABLE
-  Procesando el tipo de objeto DATABASE_EXPORT/EARLY_POST_INSTANCE_IMPCALLOUT/MARKER
-  Procesando el tipo de objeto DATABASE_EXPORT/NORMAL_OPTIONS/TABLE
-  Procesando el tipo de objeto DATABASE_EXPORT/NORMAL_OPTIONS/VIEWS_AS_TABLES/TABLE
-  Procesando el tipo de objeto DATABASE_EXPORT/NORMAL_POST_INSTANCE_IMPCALLOUT/MARKER
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/TABLE/TABLE
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/TABLE/COMMENT
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/TABLE/INDEX/INDEX
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/TABLE/CONSTRAINT/CONSTRAINT
-  Procesando el tipo de objeto DATABASE_EXPORT/FINAL_POST_INSTANCE_IMPCALLOUT/MARKER
-  Procesando el tipo de objeto DATABASE_EXPORT/SCHEMA/POST_SCHEMA/PROCACT_SCHEMA
-  Procesando el tipo de objeto DATABASE_EXPORT/AUDIT_UNIFIED/AUDIT_POLICY_ENABLE
-  Procesando el tipo de objeto DATABASE_EXPORT/AUDIT
-  Procesando el tipo de objeto DATABASE_EXPORT/POST_SYSTEM_IMPCALLOUT/MARKER
-  . . "SYS"."KU$_USER_MAPPING_VIEW"               6.257 KB      47 filas exportadas
-  . . "SYS"."AUD$"                                27.26 KB      24 filas exportadas
-  . . "SYSTEM"."REDO_DB"                          25.59 KB       1 filas exportadas
-  . . "ORDDATA"."ORDDCM_DOCS"                     252.9 KB       9 filas exportadas
-  . . "WMSYS"."WM$WORKSPACES_TABLE$"              12.10 KB       1 filas exportadas
-  . . "WMSYS"."WM$HINT_TABLE$"                    9.984 KB      97 filas exportadas
-  . . "SYS"."DAM_CLEANUP_EVENTS$"                 7.320 KB       4 filas exportadas
-  . . "LBACSYS"."OLS$INSTALLATIONS"               6.960 KB       2 filas exportadas
-  . . "WMSYS"."WM$WORKSPACE_PRIV_TABLE$"          7.078 KB      11 filas exportadas
-  . . "SYS"."DAM_CONFIG_PARAM$"                   6.531 KB      14 filas exportadas
-  . . "SYS"."TSDP_SUBPOL$"                        6.328 KB       1 filas exportadas
-  . . "WMSYS"."WM$NEXTVER_TABLE$"                 6.375 KB       1 filas exportadas
-  . . "LBACSYS"."OLS$PROPS"                       6.234 KB       5 filas exportadas
-  . . "WMSYS"."WM$ENV_VARS$"                      6.015 KB       3 filas exportadas
-  . . "SYS"."TSDP_PARAMETER$"                     5.953 KB       1 filas exportadas
-  . . "SYS"."TSDP_POLICY$"                        5.921 KB       1 filas exportadas
-  . . "WMSYS"."WM$VERSION_HIERARCHY_TABLE$"       5.984 KB       1 filas exportadas
-  . . "WMSYS"."WM$EVENTS_INFO$"                   5.812 KB      12 filas exportadas
-  . . "LBACSYS"."OLS$AUDIT_ACTIONS"               5.757 KB       8 filas exportadas
-  . . "LBACSYS"."OLS$DIP_EVENTS"                  5.539 KB       2 filas exportadas
-  . . "LBACSYS"."OLS$AUDIT"                           0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$COMPARTMENTS"                    0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$DIP_DEBUG"                       0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$GROUPS"                          0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$LAB"                             0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$LEVELS"                          0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$POL"                             0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$POLICY_ADMIN"                    0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$POLS"                            0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$POLT"                            0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$PROFILE"                         0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$PROFILES"                        0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$PROG"                            0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$SESSINFO"                        0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$USER"                            0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$USER_COMPARTMENTS"               0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$USER_GROUPS"                     0 KB       0 filas exportadas
-  . . "LBACSYS"."OLS$USER_LEVELS"                     0 KB       0 filas exportadas
-  . . "SYS"."DAM_CLEANUP_JOBS$"                       0 KB       0 filas exportadas
-  . . "SYS"."TSDP_ASSOCIATION$"                       0 KB       0 filas exportadas
-  . . "SYS"."TSDP_CONDITION$"                         0 KB       0 filas exportadas
-  . . "SYS"."TSDP_FEATURE_POLICY$"                    0 KB       0 filas exportadas
-  . . "SYS"."TSDP_PROTECTION$"                        0 KB       0 filas exportadas
-  . . "SYS"."TSDP_SENSITIVE_DATA$"                    0 KB       0 filas exportadas
-  . . "SYS"."TSDP_SENSITIVE_TYPE$"                    0 KB       0 filas exportadas
-  . . "SYS"."TSDP_SOURCE$"                            0 KB       0 filas exportadas
-  . . "SYSTEM"."REDO_LOG"                             0 KB       0 filas exportadas
-  . . "WMSYS"."WM$BATCH_COMPRESSIBLE_TABLES$"         0 KB       0 filas exportadas
-  . . "WMSYS"."WM$CONS_COLUMNS$"                      0 KB       0 filas exportadas
-  . . "WMSYS"."WM$CONSTRAINTS_TABLE$"                 0 KB       0 filas exportadas
-  . . "WMSYS"."WM$LOCKROWS_INFO$"                     0 KB       0 filas exportadas
-  . . "WMSYS"."WM$MODIFIED_TABLES$"                   0 KB       0 filas exportadas
-  . . "WMSYS"."WM$MP_GRAPH_WORKSPACES_TABLE$"         0 KB       0 filas exportadas
-  . . "WMSYS"."WM$MP_PARENT_WORKSPACES_TABLE$"        0 KB       0 filas exportadas
-  . . "WMSYS"."WM$NESTED_COLUMNS_TABLE$"              0 KB       0 filas exportadas
-  . . "WMSYS"."WM$RESOLVE_WORKSPACES_TABLE$"          0 KB       0 filas exportadas
-  . . "WMSYS"."WM$RIC_LOCKING_TABLE$"                 0 KB       0 filas exportadas
-  . . "WMSYS"."WM$RIC_TABLE$"                         0 KB       0 filas exportadas
-  . . "WMSYS"."WM$RIC_TRIGGERS_TABLE$"                0 KB       0 filas exportadas
-  . . "WMSYS"."WM$UDTRIG_DISPATCH_PROCS$"             0 KB       0 filas exportadas
-  . . "WMSYS"."WM$UDTRIG_INFO$"                       0 KB       0 filas exportadas
-  . . "WMSYS"."WM$VERSION_TABLE$"                     0 KB       0 filas exportadas
-  . . "WMSYS"."WM$VT_ERRORS_TABLE$"                   0 KB       0 filas exportadas
-  . . "WMSYS"."WM$WORKSPACE_SAVEPOINTS_TABLE$"        0 KB       0 filas exportadas
-  . . "MDSYS"."RDF_PARAM$"                        6.515 KB       3 filas exportadas
-  . . "SYS"."AUDTAB$TBS$FOR_EXPORT"               5.953 KB       2 filas exportadas
-  . . "SYS"."DBA_SENSITIVE_DATA"                      0 KB       0 filas exportadas
-  . . "SYS"."DBA_TSDP_POLICY_PROTECTION"              0 KB       0 filas exportadas
-  . . "SYS"."FGA_LOG$FOR_EXPORT"                  18.19 KB       2 filas exportadas
-  . . "SYS"."NACL$_ACE_EXP"                           0 KB       0 filas exportadas
-  . . "SYS"."NACL$_HOST_EXP"                      6.976 KB       2 filas exportadas
-  . . "SYS"."NACL$_WALLET_EXP"                        0 KB       0 filas exportadas
-  . . "SYS"."SQL$_DATAPUMP"                           0 KB       0 filas exportadas
-  . . "SYS"."SQLOBJ$AUXDATA_DATAPUMP"                 0 KB       0 filas exportadas
-  . . "SYS"."SQLOBJ$DATA_DATAPUMP"                    0 KB       0 filas exportadas
-  . . "SYS"."SQLOBJ$_DATAPUMP"                        0 KB       0 filas exportadas
-  . . "SYS"."SQLOBJ$PLAN_DATAPUMP"                    0 KB       0 filas exportadas
-  . . "SYS"."SQL$TEXT_DATAPUMP"                       0 KB       0 filas exportadas
-  . . "SYSTEM"."SCHEDULER_JOB_ARGS"                   0 KB       0 filas exportadas
-  . . "SYSTEM"."SCHEDULER_PROGRAM_ARGS"           9.515 KB      12 filas exportadas
-  . . "WMSYS"."WM$EXP_MAP"                        7.718 KB       3 filas exportadas
-  . . "WMSYS"."WM$METADATA_MAP"                       0 KB       0 filas exportadas
-  . . "LUIS"."HOLA"                                   0 KB       0 filas exportadas
-  . . "SYSTEM"."SYS_EXPORT_SCHEMA_01"                 0 KB       0 filas exportadas
-  La tabla maestra "SYSTEM"."SYS_EXPORT_FULL_01" se ha cargado/descargado correctamente
-  ******************************************************************************
-  El juego de archivos de volcado para SYSTEM.SYS_EXPORT_FULL_01 es:
-    /home/oracle/datapump/CopiaCompleta.dmp
-  El trabajo "SYSTEM"."SYS_EXPORT_FULL_01" ha terminado correctamente en Jue Feb 20 09:51:44 2020 elapsed   0 00:03:41
+- Creamos las tablas.
+
+create table solistas
+(
+IDinterprete_solista varchar2(10),
+nombre_artistico varchar2(50),
+instrumento varchar2(100),
+constraint pk_solistas primary key (IDinterprete_solista),
+constraint solistas_interpretes foreign key (IDinterprete_solista) references interpretes(id_interprete));
+
+
+
+insert into solistas values ('124223','RUBEN FERNANDEZ','flauta');
+insert into solistas values ('123456','MAURICE ANDRE','trompeta');
+insert into solistas values ('1er456','CLAUDIO ARRAU','piano');
+insert into solistas values ('654tgb','BARENBOIM','piano');
+insert into solistas values ('543frtyh','YURI BASHMET','violin');
+insert into solistas values ('12654f','HEINZ HOLLIGER','oboe');
+insert into solistas values ('qazwsxedc','HOROWITZ','piano');
+insert into solistas values ('1mkonji','MENUHIN','violin');
+insert into solistas values ('1234567','PIERRE RAMPAL','flauta');
+insert into solistas values ('123345','OISTRAKH','violin');
+
+
+create table interpretes
+(
+id_interprete varchar2(10),
+nombre_interprete varchar2(50),
+constraint pk_interpretes primary key (id_interprete),
+constraint contar check(length(id_interprete)>='5'));
+
+insert into interpretes values ('123456','MAURICE ANDRE');
+insert into interpretes values ('1er456','CLAUDIO ARRAU');
+insert into interpretes values ('654tgb','DANIEL BARENBOIM');
+insert into interpretes values ('543frtyh','YURI BASHMET');
+insert into interpretes values ('12654f','HEINZ HOLLIGER');
+insert into interpretes values ('qazwsxedc','VLADIMIR HOROWITZ');
+insert into interpretes values ('1mkonji','YEHUDI MENUHIN');
+insert into interpretes values ('1234567','MAURICE ANDRE');
+insert into interpretes values ('123345','DAVID OISTRAKH');
+insert into interpretes values ('123321','ITZHAK PERLMAN');
+insert into interpretes values ('123565','MSTISLAV ROSTROPOVICH');
+insert into interpretes values ('123422','Marc-André Hamelin ');
+insert into interpretes values ('1234777','PIERRE RAMPAL');
+insert into interpretes values ('124223','RUBEN FERNANDEZ');
+insert into interpretes values ('12bgtyhn','Martha Argerich');
+
+
+- Creamos el directorio de exportación.
+
+SQL> create directory direc_expor as 'C:\app\alvaro\admin\orcl\';
+-Damos permiso al usuario sobre el directorio.
+SQL> GRANT READ, WRITE ON DIRECTORY direc_expor TO reco2;
+SQL> GRANT READ, WRITE ON DIRECTORY direc_expor TO reco2;
+
+- Realizamos primeramente la exportación .
+
+
+C:\Windows\system32>expdp usuario1/usuario1 directory=direc_expor dumpfile=grupal11.dmp schemas=usuario1 logfile=grupalejer1.log
+
+Export: Release 11.2.0.1.0 - Production on Dom Mar 1 17:46:28 2020
+
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+Conectado a: Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit P
+roduction
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+Iniciando "USUARIO1"."SYS_EXPORT_SCHEMA_01":  usuario1/******** directory=direc_
+expor dumpfile=grupal1Ejer1.dmp schemas=usuario1 logfile=grupalejer1.log
+Estimaci¾n en curso mediante el mÚtodo BLOCKS...
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/TABLE_DATA
+Estimaci¾n total mediante el mÚtodo BLOCKS: 64 KB
+Procesando el tipo de objeto SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/TABLE
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/INDEX/INDEX
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/CONSTRAINT/CONSTRAINT
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/INDEX/STATISTICS/INDEX_STATISTI
+CS
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/COMMENT
+. . "USUARIO1"."INTERPRETES"                    5.843 KB      15 filas exportada
+s
+La tabla maestra "USUARIO1"."SYS_EXPORT_SCHEMA_01" se ha cargado/descargado corr
+ectamente
+******************************************************************************
+El juego de archivos de volcado para USUARIO1.SYS_EXPORT_SCHEMA_01 es:
+  C:\APP\ALVARO\ADMIN\ORCL\GRUPAL1EJER1.DMP
+El trabajo "USUARIO1"."SYS_EXPORT_SCHEMA_01" ha terminado correctamente en 17:47
+:22
+
+
+Importamos el fichero de exportación anteriormente creado en el usuario2 y comprobamos si se a realizado corrextamente.
+
+C:\Users\alvaro>impdp usuario2/usuario2 dumpfile=grupal1Ejer1.dmp  DIRECTORY=dir
+ec_expor logfile=impdp.log
+
+Import: Release 11.2.0.1.0 - Production on Dom Mar 1 18:43:47 2020
+
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+Conectado a: Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit P
+roduction
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+ORA-39154: Los objetos de esquemas ajenos se han eliminado de la importaci¾n
+La tabla maestra "USUARIO2"."SYS_IMPORT_FULL_01" se ha cargado/descargado correc
+tamente
+Iniciando "USUARIO2"."SYS_IMPORT_FULL_01":  usuario2/******** dumpfile=grupal1Ej
+er1.dmp DIRECTORY=direc_expor logfile=impdp.log
+El trabajo "USUARIO2"."SYS_IMPORT_FULL_01" ha terminado correctamente en 18:43:5
+2
+
+- Comprobamos que se ha realizado la importación.
+
+SQL> insert into interpretes values ('124223','RUBEN FERNANDEZ');
+
+1 fila creada.
+
+SQL> insert into interpretes values ('12bgtyhn','Martha Argerich');
+
+1 fila creada.
+
+SQL> select * from interpretes;
+
+ID_INTERPR NOMBRE_INTERPRETE
+---------- --------------------------------------------------
+123456     MAURICE ANDRE
+1er456     CLAUDIO ARRAU
+654tgb     DANIEL BARENBOIM
+543frtyh   YURI BASHMET
+12654f     HEINZ HOLLIGER
+qazwsxedc  VLADIMIR HOROWITZ
+1mkonji    YEHUDI MENUHIN
+1234567    MAURICE ANDRE
+123345     DAVID OISTRAKH
+123321     ITZHAK PERLMAN
+123565     MSTISLAV ROSTROPOVICH
+
+ID_INTERPR NOMBRE_INTERPRETE
+---------- --------------------------------------------------
+123422     Marc-André Hamelin
+1234777    PIERRE RAMPAL
+124223     RUBEN FERNANDEZ
+12bgtyhn   Martha Argerich
+
+15 filas seleccionadas.
+
+SQL>
 ~~~
-
-Una vez terminado tendremos el fichero de la importación creado.
-~~~
-ls -lh datapump/CopiaCompleta.dmp 
-  -rw-r----- 1 oracle oinstall 3,7M feb 20 09:51 datapump/CopiaCompleta.dmp
-~~~
-
 
 ## Tarea 2
 **Cread la estructura de tablas de uno de vuestros proyectos de 1º en ORACLE y, mediante una exportación cread un script básico de creación de las tablas con las respectivas restricciones. Realizad de la forma más automatizada posible las acciones necesarias para transformar ese script generado por ORACLE en un script de creación de tablas para Postgres. Documentar todas las acciones realizadas y el código usado para llevarlas a cabo.**

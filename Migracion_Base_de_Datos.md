@@ -1,5 +1,6 @@
+# Alumno 2
 
-### Tarea 1
+## Tarea 1
 **Realiza una exportación del esquema de SCOTT usando la consola Enterprise Manager, con las siguientes condiciones:**
 
 * Exporta tanto la estructura de las tablas como los datos de las mismas.
@@ -35,7 +36,7 @@ Los parametros que vamos a utilizar son:
 > directory: Le indicamos el nombre que le hemos asignado a la ruta.
 
 ~~~
-expdp system/Oracle19 schemas=SCOTT directory=dp dumpfile=SchemaScott.dmp logfile=SchemaScott.log
+expdp system/Oracle19 schemas=SCOTT directory=dp dumpfile=SchemaScott.dmp 
 
     Export: Release 12.2.0.1.0 - Production on Mié Feb 19 20:53:43 2020
 
@@ -45,7 +46,7 @@ expdp system/Oracle19 schemas=SCOTT directory=dp dumpfile=SchemaScott.dmp logfil
 
     Advertencia: Las operaciones de Oracle Data Pump no se necesitan normalmente cuando se conecta a la     raíz o al elemento inicial de una base de datos del contenedor.
 
-    Iniciando "SYSTEM"."SYS_EXPORT_SCHEMA_02":  system/******** schemas=SCOTT directory=dp  dumpfile=SchemaScott.dmp logfile=SchemaScott.log 
+    Iniciando "SYSTEM"."SYS_EXPORT_SCHEMA_02":  system/******** schemas=SCOTT directory=dp  dumpfile=SchemaScott.dmp  
     Procesando el tipo de objeto SCHEMA_EXPORT/DEFAULT_ROLE
     Procesando el tipo de objeto SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
     La tabla maestra "SYSTEM"."SYS_EXPORT_SCHEMA_02" se ha cargado/descargado correctamente
@@ -57,16 +58,83 @@ expdp system/Oracle19 schemas=SCOTT directory=dp dumpfile=SchemaScott.dmp logfil
 
 Como podemos ver nos ha creado el fichero `SchemaScott.dmp` en la dirección `/home/oracle/datapump`.
 
+
+Todo estos parámetros podemos añadirlo mediante un fichero `.par`.
+
+Creamos el fichero:
+~~~
+userid=system/Oracle19
+dumpfile=SchemaScott.dmp 
+directory=dp
+schemas=SCOTT
+~~~
+
+Y luego ejecutamos el comando `expdp hr FicheroExportacion.par`
+
 * Excluye la tabla SALGRADE y los departamentos que no tienen empleados.
 
+Utilizando los parámetros `query` y `exclude`.
+~~~
+expdp system/Oracle19 schemas=SCOTT directory=dp dumpfile=SchemaScottEsclude.dmp QUERY=dept:"where deptno in (select deptno from emp)" EXCLUDE=TABLE:"IN (select salgrade from emp)"
+~~~
 
 * Programa la operación para dentro de 15 minutos.
 
+Creamos el fichero `.par` con los parametros necesarios.
 
+Creamos el fichero:
+~~~
+cat Exportacion15min.par
+
+  userid=system/Oracle19
+  dumpfile=SchemaScott.dmp 
+  directory=dp
+  schemas=SCOTT
+~~~
+
+Ahora vamos a crear las credenciales para el usuario que va a realizar la exportación.
+~~~
+BEGIN
+dbms_credential.create_credential (
+CREDENTIAL_NAME => 'USUARIOORACLE',
+USERNAME => 'oracle',
+PASSWORD => 'oracle',
+DATABASE_ROLE => NULL,
+WINDOWS_DOMAIN => NULL,
+COMMENTS => 'Usuario del sistema para exportación',
+ENABLED => true
+);
+END;
+/
+~~~
+
+Ahora creamos el trabajo para que realice la exportación dentro de 15 min.
+~~~
+Begin 
+Dbms_scheduler.create_job 
+( 
+job_name => 'EXPORTACIONPRUEBA', 
+job_type => 'EXTERNAL_SCRIPT', 
+job_action => '/home/oracle/Exportacion15min.par', 
+start_date => sysdate, 
+Repeat_interval =>'FREQ=DAILY;BYHOUR=21; BYMINUTE=45',
+enabled => TRUE,
+credential_name=>'USUARIOORACLE'); 
+end; 
+/ 
+~~~
+
+Hemos configurado la exportación para dentro de 15 min.
 
 * Genera un archivo de log en el directorio raíz de ORACLE.
 
-### Tarea 2
+Tenemos que añadir el parámetro `logfile` para que nos cree el archivo de log.
+~~~
+expdp system/Oracle19 schemas=SCOTT directory=dp dumpfile=SchemaScott.dmp logfile=SchemaScott.log
+~~~
+
+
+## Tarea 2
 **Importa el fichero obtenido anteriormente usando Enterprise Manager pero en un usuario distinto de otra base de datos.**
 
 Tenemos que utilizar el comando `impdp` y añadir un nuevo parametro, `remap_schema` donde le indicamos dos esquemas de usuario, primero el que queremos copiar y el segundo el esquema destino.
@@ -88,7 +156,9 @@ impdp system/Oracle19 dumpfile=SchemaScott.dmp directory=dp remap_schema=SCOTT:M
   Procesando el tipo de objeto SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
   El trabajo "SYSTEM"."SYS_IMPORT_FULL_01" ha terminado correctamente en Jue Feb 20 10:26:42 2020 elapsed   0 00:00:13
 ~~~
-### Tarea3
+
+
+## Tarea3
 **Realiza una exportación de la estructura y los datos de todas las tablas de la base de datos usando el comando expdp de Oracle Data Pump encriptando la información. Prueba todas las posibles opciones que ofrece dicho comando y documentándolas adecuadamente.**
 
 Necesitamos que el usuario que va a realizar la exportación tenga los siguientes privilegios:
@@ -250,36 +320,36 @@ ls -lh datapump/CopiaCompleta.dmp
   -rw-r----- 1 oracle oinstall 3,7M feb 20 09:51 datapump/CopiaCompleta.dmp
 ~~~
 
-### Tarea 4
+## Tarea 4
 **Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con Postgres desde línea de comandos, documentando el proceso.**
 
-En postgres se pueden importar y emportar las bases de datos de dos formas, con archivos **dump** o con archivos **sql**. Siempre es mas recomendable la egunda opción, ya que la primera puede dar problemas por la versión de PostgreSQL.
+En postgres se pueden importar y exportar las bases de datos de dos formas, con archivos **dump** o con archivos **sql**. Siempre es mas recomendable la segunda opción, ya que la primera puede dar problemas por la versión de PostgreSQL.
 
 * Con archivos dump:
 
-Importar base de datos
+Exportar base de datos
 ~~~
 pg_dump -Fc -t nombre_tabla nombre_bbdd_origen -f /direccion_destino.dump
 ~~~
 
-Exportar base de datos
+Importar base de datos
 ~~~
 pg_restore -t nombre_tabla -d nombre_bbdd_destino /direccion_destino.dump
 ~~~
 
 * Con archivos sql:
 
-Importar base de datos
+Exportar base de datos
 ~~~
 pg_dump nombre_bbdd_origen -t nombre_tabla > /direccion_destino.sql
 ~~~
 
-Exportar base de datos
+Importar base de datos
 ~~~
 psql -U username -W -h host nombre_bbdd_destino < direccion_destino.sql
 ~~~
 
-Exportar base de datos (dentro del cliente pgsql)
+Importar base de datos (dentro del cliente pgsql)
 ~~~
 \i /direccion_destino.sql
 ~~~
@@ -337,5 +407,5 @@ paloma=# \d
   (12 rows)
 ~~~
 
-### Tarea 5
+## Tarea 5
 **Exporta los documentos de una colección de MongoDB que cumplan una determinada condición e impórtalos en otra base de datos.**
